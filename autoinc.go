@@ -2,7 +2,14 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
+// autoinc用于产生唯一ID，可以指定起始ID和步长。
+//  ai := autoinc.New(0, 1, 1)
+//  for i:=0; i<10; i++ {
+//      fmt.Println(ai.ID())
+//  }
 package autoinc
+
+const Version = "0.1.0.150407"
 
 // AutoInc用于产生唯一ID
 type AutoInc struct {
