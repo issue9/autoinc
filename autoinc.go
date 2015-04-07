@@ -11,13 +11,14 @@ package autoinc
 
 const Version = "0.1.0.150407"
 
-// AutoInc用于产生唯一ID
+// AutoInc用于产生唯一ID。
+// AutoInc实例一旦声明，就无法关闭，所以并不是很适合短期的服务。
 type AutoInc struct {
 	start, step int64
 	channel     chan int64
 }
 
-// 声明一个新的AutoInc实例
+// 声明一个新的AutoInc实例。
 // start：起始数值；step：步长；bufferSize；缓存的长度。
 func New(start, step, bufferSize int64) *AutoInc {
 	ret := &AutoInc{
