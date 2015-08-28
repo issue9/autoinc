@@ -9,8 +9,6 @@
 //  }
 package autoinc
 
-const Version = "0.1.0.150407"
-
 // AutoInc用于产生唯一ID。
 // AutoInc实例一旦声明，就无法关闭，所以并不是很适合短期的服务。
 type AutoInc struct {
