@@ -38,3 +38,10 @@ func New(start, step, bufferSize int64) *AutoInc {
 func (ai *AutoInc) ID() int64 {
 	return <-ai.channel
 }
+
+var defaultAI = New(1, 1, 100)
+
+// 获取从 1 开始，步长为 1 的自增 ID 值
+func ID() int64 {
+	return defaultAI.ID()
+}
