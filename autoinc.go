@@ -7,6 +7,8 @@
 //  for i:=0; i<10; i++ {
 //      fmt.Println(ai.ID())
 //  }
+//
+//  ai.Stop()
 package autoinc
 
 // AutoInc 用于产生唯一 ID。
@@ -55,16 +57,4 @@ func (ai *AutoInc) MustID() int64 {
 
 func (ai *AutoInc) Stop() {
 	ai.done <- true
-}
-
-var defaultAI = New(1, 1, 100)
-
-// 获取从 1 开始，步长为 1 的自增 ID 值
-func ID() int64 {
-	return defaultAI.MustID()
-}
-
-// 停止 ID() 的计数
-func Stop() {
-	defaultAI.Stop()
 }
