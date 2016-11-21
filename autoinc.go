@@ -15,7 +15,7 @@ package autoinc
 type AutoInc struct {
 	start, step int64
 	channel     chan int64
-	done        chan bool
+	done        chan struct{}
 }
 
 // New 声明一个新的 AutoInc 实例。
@@ -26,7 +26,7 @@ func New(start, step, bufferSize int64) *AutoInc {
 		start:   start,
 		step:    step,
 		channel: make(chan int64, bufferSize),
-		done:    make(chan bool),
+		done:    make(chan struct{}),
 	}
 
 	go func() {
@@ -51,10 +51,12 @@ func (ai *AutoInc) ID() (int64, bool) {
 	return ret, ok
 }
 
+// MustID 获取 ID 值，若不成功，则返回零值。
 func (ai *AutoInc) MustID() int64 {
 	return <-ai.channel
 }
 
+// Stop 停止计时
 func (ai *AutoInc) Stop() {
-	ai.done <- true
+	ai.done <- struct{}{}
 }
