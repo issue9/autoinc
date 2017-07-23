@@ -30,14 +30,13 @@ func New(start, step, bufferSize int64) *AutoInc {
 	}
 
 	go func() {
-		i := ret.start
 		for {
 			select {
 			case <-ret.done:
 				close(ret.channel)
 				return
-			case ret.channel <- i:
-				i += ret.step
+			case ret.channel <- ret.start:
+				ret.start += ret.step
 			}
 		}
 	}()
@@ -59,4 +58,10 @@ func (ai *AutoInc) MustID() int64 {
 // Stop 停止计时
 func (ai *AutoInc) Stop() {
 	ai.done <- struct{}{}
+}
+
+// Reset 重置 start 和 step
+func (ai *AutoInc) Reset(start, step int64) {
+	ai.start = start
+	ai.step = step
 }

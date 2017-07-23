@@ -36,6 +36,12 @@ func TestAutoInc_ID_1(t *testing.T) {
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), -100+i*-3)
 	}
+
+	ai.Reset(99, 2)
+	ai.MustID()
+	for i := 0; i < 7; i++ {
+		a.Equal(ai.MustID(), 99+2+i*2) // 第一个值跳过
+	}
 }
 
 func TestAutoInc_ID_2(t *testing.T) {
