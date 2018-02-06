@@ -80,8 +80,8 @@ func TestAutoInc_Stop(t *testing.T) {
 
 	println("stop1")
 	for {
-		id, ok := ai.ID()
-		if !ok {
+		id, err := ai.ID()
+		if err != nil {
 			break
 		}
 		println(id)
@@ -94,8 +94,8 @@ func TestAutoInc_Stop(t *testing.T) {
 	})
 	println("stop2")
 	for {
-		id, ok := ai.ID()
-		if !ok {
+		id, err := ai.ID()
+		if err != nil {
 			break
 		}
 		println(id)
