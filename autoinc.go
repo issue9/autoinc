@@ -106,17 +106,3 @@ func (ai *AutoInc) MustID() int64 {
 func (ai *AutoInc) Stop() {
 	ai.done <- struct{}{}
 }
-
-// Reset 重置整个计数器。
-//
-// 计数器将根据新的参数重新运行。但是已经产生的数据不会回收。
-func (ai *AutoInc) Reset(start, step int64) {
-	if step == 0 {
-		panic("参数 step 不能为 0")
-	}
-
-	ai.start = start
-	ai.step = step
-	ai.err = nil
-	ai.errVal = 0
-}
