@@ -5,7 +5,7 @@ autoinc 提供了一个简单的 ID 自增功能。
 ```go
 ai := autoinc.New(0, 1, 1)
 for i:=0; i<10; i++ {
-    fmt.Println(ai.ID())
+    fmt.Println(ai.MustID())
 }
 ```
 

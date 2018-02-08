@@ -5,6 +5,7 @@
 package autoinc
 
 import (
+	"math"
 	"sync"
 	"testing"
 	"time"
@@ -12,8 +13,22 @@ import (
 	"github.com/issue9/assert"
 )
 
+func TestAutoInc_overflow(t *testing.T) {
+	a := assert.New(t)
+
+	ai := New(math.MaxInt64-1, 2, 2)
+	a.NotNil(ai)
+	id, err := ai.ID()
+	a.Error(err).Equal(id, 0)
+}
+
 func TestAutoInc_ID_1(t *testing.T) {
 	a := assert.New(t)
+
+	a.Panic(func() {
+		ai := New(0, 0, 2)
+		a.Nil(ai)
+	})
 
 	// 正规的ai操作
 	ai := New(0, 2, 2)

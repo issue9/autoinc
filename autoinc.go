@@ -27,7 +27,13 @@ type AutoInc struct {
 	start, step int64
 	channel     chan int64
 	done        chan struct{}
-	err         error
+
+	// 记录错误信息
+	//
+	// 自增有可能触发溢出等错误，一旦发生，则需要记录该错误，
+	// 以及触发该错误时的 ID 值。
+	err    error
+	errVal int64
 }
 
 // New 声明一个新的 AutoInc 实例。
@@ -35,6 +41,8 @@ type AutoInc struct {
 // start：起始数值；
 // step：步长，可以为负数，但不能为 0；
 // bufferSize；缓存的长度。
+//
+// 如果 step 为 0，会直接 panic
 func New(start, step, bufferSize int64) *AutoInc {
 	if step == 0 {
 		panic("无效的参数 step")
@@ -57,6 +65,7 @@ func New(start, step, bufferSize int64) *AutoInc {
 				if (ret.step > 0 && ret.start > 0 && (math.MaxInt64-ret.start) < ret.step) ||
 					(ret.step < 0 && ret.start < 0 && (-math.MaxInt64-ret.start) > ret.step) {
 					ret.err = ErrOverflow
+					ret.errVal = ret.start
 					return
 				}
 
@@ -68,13 +77,14 @@ func New(start, step, bufferSize int64) *AutoInc {
 	return ret
 }
 
-// ID 获取 ID 值。若已经调用 Stop，则之后的 ID 值不保证正确。
+// ID 获取 ID 值。
 func (ai *AutoInc) ID() (int64, error) {
-	if ai.err != nil {
+	ret, ok := <-ai.channel
+
+	// NOTE: 不能只通过判断 errVal 与 id 的值来确定是否出错，两都有可能是 0
+	if ai.err != nil && ai.errVal == ret {
 		return 0, ai.err
 	}
-
-	ret, ok := <-ai.channel
 
 	if !ok {
 		return 0, ErrNotFound
@@ -97,8 +107,16 @@ func (ai *AutoInc) Stop() {
 	ai.done <- struct{}{}
 }
 
-// Reset 重置 start 和 step
+// Reset 重置整个计数器。
+//
+// 计数器将根据新的参数重新运行。但是已经产生的数据不会回收。
 func (ai *AutoInc) Reset(start, step int64) {
+	if step == 0 {
+		panic("参数 step 不能为 0")
+	}
+
 	ai.start = start
 	ai.step = step
+	ai.err = nil
+	ai.errVal = 0
 }
