@@ -32,8 +32,13 @@ type AutoInc struct {
 	//
 	// 自增有可能触发溢出等错误，一旦发生，则需要记录该错误，
 	// 以及触发该错误时的 ID 值。
+	//
+	// 所有的 ID 值是提交保存在 channel 中的，并不是一发生数据溢出了，
+	// 马上 ID() 就不可用了。而是要等待 ID() 将 channel 中的值取完，
+	// 才会出返回错误信息。
 	err    error
 	errVal int64
+	faild  bool
 }
 
 // New 声明一个新的 AutoInc 实例。
@@ -79,15 +84,20 @@ func New(start, step, bufferSize int64) *AutoInc {
 
 // ID 获取 ID 值。
 func (ai *AutoInc) ID() (int64, error) {
-	ret, ok := <-ai.channel
-
-	// NOTE: 不能只通过判断 errVal 与 id 的值来确定是否出错，两都有可能是 0
-	if ai.err != nil && ai.errVal == ret {
+	if ai.faild {
 		return 0, ai.err
 	}
 
+	ret, ok := <-ai.channel
+
 	if !ok {
 		return 0, ErrNotFound
+	}
+
+	// NOTE: 不能只通过判断 errVal 与 id 的值来确定是否出错，两都有可能是 0。
+	// ai.errVal 值本身是可用的。可以正常返回。
+	if ai.err != nil && ai.errVal == ret {
+		ai.faild = true
 	}
 	return ret, nil
 }

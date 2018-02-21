@@ -19,6 +19,12 @@ func TestAutoInc_overflow(t *testing.T) {
 	ai := New(math.MaxInt64-1, 2, 2)
 	a.NotNil(ai)
 	id, err := ai.ID()
+	a.NotError(err).Equal(id, ai.errVal)
+
+	id, err = ai.ID()
+	a.Equal(err, ErrNotFound).Equal(id, 0)
+
+	id, err = ai.ID()
 	a.Error(err).Equal(id, 0)
 }
 
