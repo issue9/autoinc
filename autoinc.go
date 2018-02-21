@@ -28,17 +28,8 @@ type AutoInc struct {
 	channel     chan int64
 	done        chan struct{}
 
-	// 记录错误信息
-	//
-	// 自增有可能触发溢出等错误，一旦发生，则需要记录该错误，
-	// 以及触发该错误时的 ID 值。
-	//
-	// 所有的 ID 值是提交保存在 channel 中的，并不是一发生数据溢出了，
-	// 马上 ID() 就不可用了。而是要等待 ID() 将 channel 中的值取完，
-	// 才会出返回错误信息。
-	err    error
-	errVal int64
-	faild  bool
+	err   error
+	faild bool
 }
 
 // New 声明一个新的 AutoInc 实例。
@@ -70,7 +61,6 @@ func New(start, step, bufferSize int64) *AutoInc {
 				if (ret.step > 0 && ret.start > 0 && (math.MaxInt64-ret.start) < ret.step) ||
 					(ret.step < 0 && ret.start < 0 && (-math.MaxInt64-ret.start) > ret.step) {
 					ret.err = ErrOverflow
-					ret.errVal = ret.start
 					// 此时不能关闭 channel，其中依然有值。即不能设置 done，也不能 close(channel)
 					return
 				}
@@ -99,9 +89,8 @@ func (ai *AutoInc) ID() (int64, error) {
 		return 0, ErrNotFound
 	}
 
-	// NOTE: 不能只通过判断 errVal 与 id 的值来确定是否出错，两都有可能是 0。
-	// ai.errVal 值本身是可用的。可以正常返回。
-	if ai.err != nil && ai.errVal == ret {
+	// 如果仅判断 channel 是否为空，则有可能是写 channel 的速度没有读 channel 的快。
+	if ai.err != nil && len(ai.channel) == 0 {
 		ai.faild = true
 	}
 	return ret, nil
