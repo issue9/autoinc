@@ -71,6 +71,7 @@ func New(start, step, bufferSize int64) *AutoInc {
 					(ret.step < 0 && ret.start < 0 && (-math.MaxInt64-ret.start) > ret.step) {
 					ret.err = ErrOverflow
 					ret.errVal = ret.start
+					// 此时不能关闭 channel，其中依然有值。即不能设置 done，也不能 close(channel)
 					return
 				}
 
@@ -91,6 +92,10 @@ func (ai *AutoInc) ID() (int64, error) {
 	ret, ok := <-ai.channel
 
 	if !ok {
+		if ai.err != nil {
+			return 0, ai.err
+		}
+
 		return 0, ErrNotFound
 	}
 
