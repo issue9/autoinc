@@ -18,14 +18,14 @@ func TestAutoInc_overflow(t *testing.T) {
 
 	ai := New(math.MaxInt64-1, 2, 2)
 	a.NotNil(ai)
-	id, err := ai.ID()
-	a.NotError(err).Equal(0, len(ai.channel))
+	id, ok := ai.ID()
+	a.True(ok).Equal(0, len(ai.channel))
 
-	id, err = ai.ID()
-	a.Equal(err, ErrOverflow).Equal(id, 0)
+	id, ok = ai.ID()
+	a.False(ok).Equal(id, 0)
 
-	id, err = ai.ID()
-	a.Error(err).Equal(id, 0)
+	id, ok = ai.ID()
+	a.False(ok).Equal(id, 0)
 }
 
 func TestAutoInc_ID_1(t *testing.T) {
@@ -46,10 +46,12 @@ func TestAutoInc_ID_1(t *testing.T) {
 	// 停止这后，读取完全已经在 channel 中的数值，则返回错误
 	ai.Stop()
 	time.Sleep(300 * time.Millisecond) // 保证 close(channel) 在 ID() 之前被执行
-	v, err := ai.ID()
-	v, err = ai.ID()
-	v, err = ai.ID()
-	a.Equal(err, ErrNotFound).Equal(0, v)
+	v, ok := ai.ID()
+	a.True(ok)
+	v, ok = ai.ID()
+	a.True(ok)
+	v, ok = ai.ID()
+	a.False(ok).Equal(0, v)
 
 	// 可以从负数起始
 	ai = New(-100, 2, 5)
@@ -102,8 +104,8 @@ func TestAutoInc_Stop(t *testing.T) {
 
 	println("stop1")
 	for {
-		id, err := ai.ID()
-		if err != nil {
+		id, ok := ai.ID()
+		if !ok {
 			break
 		}
 		println(id)
@@ -116,8 +118,8 @@ func TestAutoInc_Stop(t *testing.T) {
 	})
 	println("stop2")
 	for {
-		id, err := ai.ID()
-		if err != nil {
+		id, ok := ai.ID()
+		if !ok {
 			break
 		}
 		println(id)
