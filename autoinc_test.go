@@ -43,9 +43,9 @@ func TestAutoInc_ID_1(t *testing.T) {
 		a.Equal(ai.MustID(), i*2)
 	}
 
-	// 停止这后，读取完全已经在 channel 中的数值，则返回错误
+	// 停止之后，读取完全已经在 channel 中的数值，则返回错误
 	ai.Stop()
-	time.Sleep(300 * time.Millisecond) // 保证 close(channel) 在 ID() 之前被执行
+	time.Sleep(3000 * time.Millisecond) // 保证 close(channel) 在 ID() 之前被执行
 	v, ok := ai.ID()
 	a.True(ok)
 	v, ok = ai.ID()
