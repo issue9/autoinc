@@ -44,33 +44,35 @@ func New(start, step, bufferSize int64) *AutoInc {
 		panic("无效的参数 step")
 	}
 
-	ret := &AutoInc{
+	ai := &AutoInc{
 		start:   start,
 		step:    step,
 		channel: make(chan int64, bufferSize),
 		done:    make(chan struct{}),
 	}
 
-	go func() {
-		for {
-			select {
-			case <-ret.done:
-				close(ret.channel)
+	go ai.generator()
+
+	return ai
+}
+
+func (ai *AutoInc) generator() {
+	for {
+		select {
+		case <-ai.done:
+			close(ai.channel)
+			return
+		case ai.channel <- ai.start:
+			if (ai.step > 0 && ai.start > 0 && (math.MaxInt64-ai.start) < ai.step) ||
+				(ai.step < 0 && ai.start < 0 && (-math.MaxInt64-ai.start) > ai.step) {
+				ai.err = ErrOverflow
+				// 此时不能关闭 channel，其中依然有值。即不能设置 done，也不能 close(channel)
 				return
-			case ret.channel <- ret.start:
-				if (ret.step > 0 && ret.start > 0 && (math.MaxInt64-ret.start) < ret.step) ||
-					(ret.step < 0 && ret.start < 0 && (-math.MaxInt64-ret.start) > ret.step) {
-					ret.err = ErrOverflow
-					// 此时不能关闭 channel，其中依然有值。即不能设置 done，也不能 close(channel)
-					return
-				}
-
-				ret.start += ret.step
 			}
-		} // end for
-	}()
 
-	return ret
+			ai.start += ai.step
+		}
+	}
 }
 
 // ID 获取 ID 值。
