@@ -26,6 +26,11 @@ func TestAutoInc_overflow(t *testing.T) {
 
 	id, ok = ai.ID()
 	a.False(ok).Equal(id, 0)
+
+	a.Panic(func() {
+		id = ai.MustID()
+		a.Equal(id, 0)
+	})
 }
 
 func TestAutoInc_ID_1(t *testing.T) {
@@ -42,16 +47,6 @@ func TestAutoInc_ID_1(t *testing.T) {
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), i*2)
 	}
-
-	// 停止之后，读取完全已经在 channel 中的数值，则返回错误
-	ai.Stop()
-	time.Sleep(3000 * time.Millisecond) // 保证 close(channel) 在 ID() 之前被执行
-	v, ok := ai.ID()
-	a.True(ok)
-	v, ok = ai.ID()
-	a.True(ok)
-	v, ok = ai.ID()
-	a.False(ok).Equal(0, v)
 
 	// 可以从负数起始
 	ai = New(-100, 2, 5)
