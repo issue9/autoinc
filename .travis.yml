@@ -11,6 +11,6 @@ go:
   - 1.8
 
 install:
-    - go get github.com/issue9/assert
+  - go get github.com/issue9/assert
 
 script: go test -race -v ./...
