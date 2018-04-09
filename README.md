@@ -1,4 +1,6 @@
 autoinc [![Build Status](https://travis-ci.org/issue9/autoinc.svg?branch=master)](https://travis-ci.org/issue9/autoinc)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://opensource.org/licenses/MIT)
+[![codecov](https://codecov.io/gh/issue9/autoinc/branch/master/graph/badge.svg)](https://codecov.io/gh/issue9/autoinc)
 ======
 
 autoinc 提供了一个简单的 ID 自增功能。

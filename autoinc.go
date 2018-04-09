@@ -11,9 +11,7 @@
 //  ai.Stop()
 package autoinc
 
-import (
-	"math"
-)
+import "math"
 
 // AutoInc 用于产生唯一 ID。
 type AutoInc struct {
