@@ -19,7 +19,7 @@ func TestAutoInc_overflow(t *testing.T) {
 	ai := New(math.MaxInt64-1, 2, 2)
 	a.NotNil(ai)
 	id, ok := ai.ID()
-	a.True(ok).Equal(0, len(ai.channel))
+	a.True(ok).Equal(math.MaxInt64-1, id)
 
 	id, ok = ai.ID()
 	a.False(ok).Equal(id, 0)
