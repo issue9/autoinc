@@ -11,13 +11,17 @@
 //  ai.Stop()
 package autoinc
 
-import "math"
+import (
+	"math"
+	"sync"
+)
 
 // AutoInc 用于产生唯一 ID。
 type AutoInc struct {
 	start, step int64
 	channel     chan int64
 	done        chan struct{}
+	once        sync.Once
 }
 
 // New 声明一个新的 AutoInc 实例。
@@ -36,7 +40,10 @@ func New(start, step, bufferSize int64) *AutoInc {
 		start:   start,
 		step:    step,
 		channel: make(chan int64, bufferSize),
-		done:    make(chan struct{}),
+
+		// 长度为 1，保证 once 可以正常使用，且不被阻塞。
+		done: make(chan struct{}, 1),
+		once: sync.Once{},
 	}
 
 	go ai.generator()
@@ -49,13 +56,11 @@ func (ai *AutoInc) generator() {
 		select {
 		case <-ai.done:
 			close(ai.channel)
-			close(ai.done)
 			return
 		case ai.channel <- ai.start: // 在 channel 未满之前，此条一直有效
 			if (ai.step > 0 && ai.start > 0 && (math.MaxInt64-ai.start) < ai.step) ||
 				(ai.step < 0 && ai.start < 0 && (-math.MaxInt64-ai.start) > ai.step) {
 				close(ai.channel)
-				close(ai.done)
 				return
 			}
 
@@ -84,5 +89,7 @@ func (ai *AutoInc) MustID() int64 {
 
 // Stop 停止计时
 func (ai *AutoInc) Stop() {
-	ai.done <- struct{}{}
+	ai.once.Do(func() {
+		ai.done <- struct{}{}
+	})
 }

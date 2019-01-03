@@ -109,17 +109,15 @@ func TestAutoInc_Stop(t *testing.T) {
 	a.NotNil(ai)
 	time.Sleep(time.Microsecond * 500)
 	ai.Stop()
-	a.Panic(func() { // 多次调用，会 panic
-		ai.Stop()
-	})
+	ai.Stop() // 多次调用
 	a.Equal(len(ai.channel), 100)
 
-	// 溢出，导致自动关闭 ai.channel 并退出 ai.generator，
+	// 溢出，ai.generator 已被关闭
 	ai = New(math.MaxInt64-1, 2, 4)
 	a.NotNil(ai)
 	time.Sleep(time.Microsecond * 500)
-	a.Panic(func() { // 此时，因为溢出，已经被关闭，所以会 panic
-		ai.Stop()
-	})
+	ai.Stop()
+	ai.Stop()
+	ai.Stop()
 	a.Equal(len(ai.channel), 1)
 }
