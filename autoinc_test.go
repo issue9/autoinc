@@ -20,7 +20,7 @@ func TestAutoInc_overflow(t *testing.T) {
 	a.NotNil(ai)
 
 	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
-	a.Equal(len(ai.channel), 1)        // 一条数据训超出 math.MaxInt64
+	a.Equal(len(ai.channel), 1)        // 一条数据超出 math.MaxInt64
 
 	id, ok := ai.ID()
 	a.True(ok).Equal(math.MaxInt64-1, id)
@@ -101,28 +101,25 @@ func TestAutoInc_Stop(t *testing.T) {
 
 	ai := New(0, 1, 2)
 	a.NotNil(ai)
+	time.Sleep(time.Microsecond * 500)
 	ai.Stop()
-
-	println("stop1")
-	for {
-		id, ok := ai.ID()
-		if !ok {
-			break
-		}
-		println(id)
-	}
+	a.Equal(len(ai.channel), 2)
 
 	ai = New(0, 2, 100)
 	a.NotNil(ai)
-	time.AfterFunc(20*time.Microsecond, func() {
+	time.Sleep(time.Microsecond * 500)
+	ai.Stop()
+	a.Panic(func() { // 多次调用，会 panic
 		ai.Stop()
 	})
-	println("stop2")
-	for {
-		id, ok := ai.ID()
-		if !ok {
-			break
-		}
-		println(id)
-	}
+	a.Equal(len(ai.channel), 100)
+
+	// 溢出，导致自动关闭 ai.channel 并退出 ai.generator，
+	ai = New(math.MaxInt64-1, 2, 4)
+	a.NotNil(ai)
+	time.Sleep(time.Microsecond * 500)
+	a.Panic(func() { // 此时，因为溢出，已经被关闭，所以会 panic
+		ai.Stop()
+	})
+	a.Equal(len(ai.channel), 1)
 }

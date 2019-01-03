@@ -49,11 +49,13 @@ func (ai *AutoInc) generator() {
 		select {
 		case <-ai.done:
 			close(ai.channel)
+			close(ai.done)
 			return
 		case ai.channel <- ai.start: // 在 channel 未满之前，此条一直有效
 			if (ai.step > 0 && ai.start > 0 && (math.MaxInt64-ai.start) < ai.step) ||
 				(ai.step < 0 && ai.start < 0 && (-math.MaxInt64-ai.start) > ai.step) {
 				close(ai.channel)
+				close(ai.done)
 				return
 			}
 
