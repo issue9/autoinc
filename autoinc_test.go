@@ -16,8 +16,12 @@ import (
 func TestAutoInc_overflow(t *testing.T) {
 	a := assert.New(t)
 
-	ai := New(math.MaxInt64-1, 2, 2)
+	ai := New(math.MaxInt64-1, 2, 4)
 	a.NotNil(ai)
+
+	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
+	a.Equal(len(ai.channel), 1)        // 一条数据训超出 math.MaxInt64
+
 	id, ok := ai.ID()
 	a.True(ok).Equal(math.MaxInt64-1, id)
 
@@ -44,6 +48,8 @@ func TestAutoInc_ID_1(t *testing.T) {
 	// 正规的ai操作
 	ai := New(0, 2, 2)
 	a.NotNil(ai)
+	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
+	a.Equal(len(ai.channel), 2)
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), i*2)
 	}
