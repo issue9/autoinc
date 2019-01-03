@@ -45,7 +45,7 @@ func TestAutoInc_ID_1(t *testing.T) {
 		a.Nil(ai)
 	})
 
-	// 正规的ai操作
+	// 正规的 ai 操作
 	ai := New(0, 2, 2)
 	a.NotNil(ai)
 	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
