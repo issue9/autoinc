@@ -18,13 +18,12 @@ func TestAutoInc_overflow(t *testing.T) {
 
 	ai := New(math.MaxInt64-1, 2, 4)
 	a.NotNil(ai)
-
 	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
-	a.Equal(len(ai.channel), 1)        // 一条数据超出 math.MaxInt64
 
 	id, ok := ai.ID()
 	a.True(ok).Equal(math.MaxInt64-1, id)
 
+	// 不存在第二条数据
 	id, ok = ai.ID()
 	a.False(ok).Equal(id, 0)
 
@@ -49,7 +48,6 @@ func TestAutoInc_ID_1(t *testing.T) {
 	ai := New(0, 2, 2)
 	a.NotNil(ai)
 	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
-	a.Equal(len(ai.channel), 2)
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), i*2)
 	}
@@ -103,14 +101,12 @@ func TestAutoInc_Stop(t *testing.T) {
 	a.NotNil(ai)
 	time.Sleep(time.Microsecond * 500)
 	ai.Stop()
-	a.Equal(len(ai.channel), 2)
 
 	ai = New(0, 2, 100)
 	a.NotNil(ai)
 	time.Sleep(time.Microsecond * 500)
 	ai.Stop()
 	ai.Stop() // 多次调用
-	a.Equal(len(ai.channel), 100)
 
 	// 溢出，ai.generator 已被关闭
 	ai = New(math.MaxInt64-1, 2, 4)
@@ -119,5 +115,4 @@ func TestAutoInc_Stop(t *testing.T) {
 	ai.Stop()
 	ai.Stop()
 	ai.Stop()
-	a.Equal(len(ai.channel), 1)
 }
