@@ -31,7 +31,7 @@ type AutoInc struct {
 // bufferSize：缓存的长度。
 //
 // 如果 step 为 0，会直接 panic
-func New(start, step, bufferSize int64) *AutoInc {
+func New(start, step int64, bufferSize int) *AutoInc {
 	if step == 0 {
 		panic("无效的参数 step")
 	}
