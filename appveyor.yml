@@ -1,7 +1,7 @@
 
 build: off
 
-clone_folder: c:\gopath\src\github.com\$username\$project
+clone_folder: c:\gopath\src\github.com\issue9\autoinc
 
 environment:
   GO111MODULE: off
