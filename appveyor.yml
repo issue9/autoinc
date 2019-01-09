@@ -4,7 +4,7 @@ build: off
 clone_folder: c:\gopath\src\github.com\issue9\autoinc
 
 environment:
-  GO111MODULE: off
+  GO111MODULE: on
 
 stack: go 1.11
 
