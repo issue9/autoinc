@@ -1,4 +1,6 @@
-autoinc [![Build Status](https://travis-ci.org/issue9/autoinc.svg?branch=master)](https://travis-ci.org/issue9/autoinc)
+autoinc
+[![Build Status](https://travis-ci.org/issue9/autoinc.svg?branch=master)](https://travis-ci.org/issue9/autoinc)
+[![Build status](https://ci.appveyor.com/api/projects/status/lkit5143eg8f4wuc?svg=true)](https://ci.appveyor.com/project/caixw/autoinc)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/issue9/autoinc/branch/master/graph/badge.svg)](https://codecov.io/gh/issue9/autoinc)
 ======
