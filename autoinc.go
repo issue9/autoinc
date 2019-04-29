@@ -87,7 +87,7 @@ func (ai *AutoInc) MustID() int64 {
 	return id
 }
 
-// Stop 停止计时
+// Stop 停止生成唯一数值。
 func (ai *AutoInc) Stop() {
 	ai.once.Do(func() {
 		ai.done <- struct{}{}
