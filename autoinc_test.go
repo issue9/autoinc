@@ -106,13 +106,10 @@ func TestAutoInc_Stop(t *testing.T) {
 	a.NotNil(ai)
 	time.Sleep(time.Microsecond * 500)
 	ai.Stop()
-	ai.Stop() // 多次调用
 
 	// 溢出，ai.generator 已被关闭
 	ai = New(math.MaxInt64-1, 2, 4)
 	a.NotNil(ai)
 	time.Sleep(time.Microsecond * 500)
-	ai.Stop()
-	ai.Stop()
 	ai.Stop()
 }

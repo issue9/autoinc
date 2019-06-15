@@ -13,7 +13,6 @@ package autoinc
 
 import (
 	"math"
-	"sync"
 )
 
 // AutoInc 用于产生唯一 ID。
@@ -21,7 +20,6 @@ type AutoInc struct {
 	start, step int64
 	channel     chan int64
 	done        chan struct{}
-	once        sync.Once
 }
 
 // New 声明一个新的 AutoInc 实例。
@@ -40,10 +38,7 @@ func New(start, step int64, bufferSize int) *AutoInc {
 		start:   start,
 		step:    step,
 		channel: make(chan int64, bufferSize),
-
-		// 长度为 1，保证 once 可以正常使用，且不被阻塞。
-		done: make(chan struct{}, 1),
-		once: sync.Once{},
+		done:    make(chan struct{}, 1),
 	}
 
 	go ai.generator()
@@ -87,9 +82,9 @@ func (ai *AutoInc) MustID() int64 {
 	return id
 }
 
-// Stop 停止生成唯一数值。
+// Stop 停止服务。
+//
+// NOTE: 多次调用，会造成死锁。
 func (ai *AutoInc) Stop() {
-	ai.once.Do(func() {
-		ai.done <- struct{}{}
-	})
+	ai.done <- struct{}{}
 }
