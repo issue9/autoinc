@@ -1,6 +1,4 @@
-// Copyright 2015 by caixw, All rights reserved.
-// Use of this source code is governed by a MIT
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
 
 // Package autoinc 用于产生唯一 ID，可以指定起始 ID 和步长。
 //  ai := autoinc.New(0, 1, 1)
@@ -11,9 +9,7 @@
 //  ai.Stop()
 package autoinc
 
-import (
-	"math"
-)
+import "math"
 
 // AutoInc 用于产生唯一 ID。
 type AutoInc struct {
