@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-// Package autoinc 用于产生唯一 ID，可以指定起始 ID 和步长。
+// Package autoinc 用于产生唯一 ID
+//
 //  ai := autoinc.New(0, 1, 1)
 //  for i:=0; i<10; i++ {
 //      fmt.Println(ai.ID())
@@ -11,14 +12,14 @@ package autoinc
 
 import "math"
 
-// AutoInc 用于产生唯一 ID。
+// AutoInc 用于产生唯一 ID
 type AutoInc struct {
 	start, step int64
 	channel     chan int64
 	done        chan struct{}
 }
 
-// New 声明一个新的 AutoInc 实例。
+// New 声明一个新的 AutoInc 实例
 //
 // start：起始数值；
 // step：步长，可以为负数，但不能为 0；
@@ -60,7 +61,7 @@ func (ai *AutoInc) generator() {
 	}
 }
 
-// ID 获取 ID 值。
+// ID 获取 ID 值
 //
 // 第二个参数若返回 false，表示当前的 ID 值已经失效。
 func (ai *AutoInc) ID() (int64, bool) {
@@ -68,7 +69,9 @@ func (ai *AutoInc) ID() (int64, bool) {
 	return ret, ok
 }
 
-// MustID 获取 ID 值，若不成功，则 panic。
+// MustID 获取 ID 值
+//
+// 与 ID() 的不同在于，出错时会直接 panic。
 func (ai *AutoInc) MustID() int64 {
 	id, ok := ai.ID()
 	if !ok {
@@ -78,7 +81,7 @@ func (ai *AutoInc) MustID() int64 {
 	return id
 }
 
-// Stop 停止服务。
+// Stop 停止服务
 //
 // NOTE: 多次调用，会造成死锁。
 func (ai *AutoInc) Stop() {

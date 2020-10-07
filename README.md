@@ -1,11 +1,11 @@
 autoinc
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fissue9%2Fautoinc%2Fbadge%3Fref%3Dmaster&style=flat)](https://actions-badge.atrox.dev/issue9/autoinc/goto?ref=master)
-[![Build Status](https://travis-ci.org/issue9/autoinc.svg?branch=master)](https://travis-ci.org/issue9/autoinc)
+[![Go](https://github.com/issue9/autoinc/workflows/Go/badge.svg)](https://github.com/issue9/autoinc/actions?query=workflow%3AGo)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/issue9/autoinc/branch/master/graph/badge.svg)](https://codecov.io/gh/issue9/autoinc)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/issue9/autoinc)](https://pkg.go.dev/github.com/issue9/autoinc)
 ======
 
-autoinc 提供了一个简单的 ID 自增功能。
+autoinc 提供了一个简单的 ID 自增功能
 
 ```go
 ai := autoinc.New(0, 1, 1)
@@ -20,12 +20,6 @@ for i:=0; i<10; i++ {
 ```shell
 go get github.com/issue9/autoinc
 ```
-
-文档
-----
-
-[![Go Walker](https://gowalker.org/api/v1/badge)](https://gowalker.org/github.com/issue9/autoinc)
-[![GoDoc](https://godoc.org/github.com/issue9/autoinc?status.svg)](https://godoc.org/github.com/issue9/autoinc)
 
 版权
 ----
