@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/issue9/assert"
+	"github.com/issue9/assert/v2"
 )
 
 func TestAutoInc_overflow(t *testing.T) {
-	a := assert.New(t)
+	a := assert.New(t, false)
 
 	ai := New(math.MaxInt64-1, 2, 4)
 	a.NotNil(ai)
@@ -35,7 +35,7 @@ func TestAutoInc_overflow(t *testing.T) {
 }
 
 func TestAutoInc_ID_1(t *testing.T) {
-	a := assert.New(t)
+	a := assert.New(t, false)
 
 	a.Panic(func() {
 		ai := New(0, 0, 2)
@@ -66,7 +66,7 @@ func TestAutoInc_ID_1(t *testing.T) {
 }
 
 func TestAutoInc_ID_2(t *testing.T) {
-	a := assert.New(t)
+	a := assert.New(t, false)
 
 	ai := New(2, 2, 2)
 	a.NotNil(ai)
@@ -93,7 +93,7 @@ func TestAutoInc_ID_2(t *testing.T) {
 }
 
 func TestAutoInc_Stop(t *testing.T) {
-	a := assert.New(t)
+	a := assert.New(t, false)
 
 	ai := New(0, 1, 2)
 	a.NotNil(ai)
