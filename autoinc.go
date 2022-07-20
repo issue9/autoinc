@@ -84,6 +84,4 @@ func (ai *AutoInc) MustID() int64 {
 // Stop 停止服务
 //
 // NOTE: 多次调用，会造成死锁。
-func (ai *AutoInc) Stop() {
-	ai.done <- struct{}{}
-}
+func (ai *AutoInc) Stop() { ai.done <- struct{}{} }
