@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// Package autoinc 用于产生唯一 ID
+// Package autoinc 用于产生自增 ID
 //
 //  ai := autoinc.New(0, 1, 1)
 //  for i:=0; i<10; i++ {
@@ -12,7 +12,6 @@ package autoinc
 
 import "math"
 
-// AutoInc 用于产生唯一 ID
 type AutoInc struct {
 	start, step int64
 	channel     chan int64
