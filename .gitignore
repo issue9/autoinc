@@ -29,5 +29,6 @@ _testmain.go
 #os x
 .DS_Store
 
-.idea
-.vscode
+.idea/
+.vscode/
+.vs/

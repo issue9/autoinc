@@ -16,7 +16,7 @@ func TestAutoInc_overflow(t *testing.T) {
 
 	ai := New(math.MaxInt64-1, 2, 4)
 	a.NotNil(ai)
-	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
+	time.Sleep(500 * time.Microsecond) // 保证 ai.generator 执行完成
 
 	id, ok := ai.ID()
 	a.True(ok).Equal(math.MaxInt64-1, id)
