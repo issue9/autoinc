@@ -3,6 +3,7 @@
 package autoinc
 
 import (
+	"context"
 	"math"
 	"sync"
 	"testing"
@@ -16,7 +17,10 @@ func TestAutoInc_overflow(t *testing.T) {
 
 	ai := New(math.MaxInt64-1, 2, 4)
 	a.NotNil(ai)
-	time.Sleep(500 * time.Microsecond) // 保证 ai.generator 执行完成
+	go func() {
+		a.ErrorIs(ai.Serve(context.Background()), ErrOverflow())
+	}()
+	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 
 	id, ok := ai.ID()
 	a.True(ok).Equal(math.MaxInt64-1, id)
@@ -43,36 +47,52 @@ func TestAutoInc_ID_1(t *testing.T) {
 	})
 
 	// 正规的 ai 操作
+	ctx, cancel := context.WithCancel(context.Background())
 	ai := New(0, 2, 2)
 	a.NotNil(ai)
-	time.Sleep(500 * time.Microsecond) // 保证 ai.generater 执行完成
+	go ai.Serve(ctx)
+	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), i*2)
 	}
+	cancel()
 
 	// 可以从负数起始
+	ctx, cancel = context.WithCancel(context.Background())
 	ai = New(-100, 2, 5)
 	a.NotNil(ai)
+	go ai.Serve(ctx)
+	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), -100+i*2)
 	}
+	cancel()
 
 	// start,step 双负数
+	ctx, cancel = context.WithCancel(context.Background())
 	ai = New(-100, -3, 0)
 	a.NotNil(ai)
+	go ai.Serve(ctx)
+	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), -100+i*-3)
 	}
+	cancel()
 }
 
 func TestAutoInc_ID_2(t *testing.T) {
 	a := assert.New(t, false)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	ai := New(2, 2, 2)
 	a.NotNil(ai)
+	go ai.Serve(ctx)
+	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 
 	mu := sync.Mutex{}
 	mapped := map[int64]bool{}
+	wg := &sync.WaitGroup{}
 
 	fn := func() {
 		for i := 0; i < 100; i++ {
@@ -84,30 +104,13 @@ func TestAutoInc_ID_2(t *testing.T) {
 			mapped[id] = true
 			mu.Unlock()
 		}
+		wg.Done()
 	}
 
+	wg.Add(4)
 	go fn()
 	go fn()
 	go fn()
 	go fn()
-}
-
-func TestAutoInc_Stop(t *testing.T) {
-	a := assert.New(t, false)
-
-	ai := New(0, 1, 2)
-	a.NotNil(ai)
-	time.Sleep(time.Microsecond * 500)
-	ai.Stop()
-
-	ai = New(0, 2, 100)
-	a.NotNil(ai)
-	time.Sleep(time.Microsecond * 500)
-	ai.Stop()
-
-	// 溢出，ai.generator 已被关闭
-	ai = New(math.MaxInt64-1, 2, 4)
-	a.NotNil(ai)
-	time.Sleep(time.Microsecond * 500)
-	ai.Stop()
+	wg.Wait()
 }

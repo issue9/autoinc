@@ -2,20 +2,30 @@
 
 // Package autoinc 用于产生自增 ID
 //
-//  ai := autoinc.New(0, 1, 1)
-//  for i:=0; i<10; i++ {
-//      fmt.Println(ai.ID())
-//  }
+//	ai := autoinc.New(0, 1, 1)
+//	ctx, cancel = context.WithCancel(context.Background())
+//	defer cancel()
 //
-//  ai.Stop()
+//	go ai.Serve(ctx)
+//	for i:=0; i<10; i++ {
+//	    fmt.Println(ai.ID())
+//	}
 package autoinc
 
-import "math"
+import (
+	"context"
+	"errors"
+	"math"
+)
+
+var errOverflow = errors.New("溢出")
+
+// ErrOverflow 表示自增 ID 溢出了
+func ErrOverflow() error { return errOverflow }
 
 type AutoInc struct {
 	start, step int64
 	channel     chan int64
-	done        chan struct{}
 }
 
 // New 声明一个新的 AutoInc 实例
@@ -30,29 +40,29 @@ func New(start, step int64, bufferSize int) *AutoInc {
 		panic("无效的参数 step")
 	}
 
-	ai := &AutoInc{
+	return &AutoInc{
 		start:   start,
 		step:    step,
 		channel: make(chan int64, bufferSize),
-		done:    make(chan struct{}, 1),
 	}
-
-	go ai.generator()
-
-	return ai
 }
 
-func (ai *AutoInc) generator() {
+// Serve 运行该服务
+//
+// 这是个阻塞方法，只有此方法运行之后，[AutoInc.ID] 等才有返回值。
+//
+// 当前自增项超过最大值时，会返回 [ErrOverflow] 错误。
+func (ai *AutoInc) Serve(ctx context.Context) error {
 	for {
 		select {
-		case <-ai.done:
+		case <-ctx.Done():
 			close(ai.channel)
-			return
-		case ai.channel <- ai.start: // 在 channel 未满之前，此条一直有效
+			return ctx.Err()
+		case ai.channel <- ai.start:
 			if (ai.step > 0 && ai.start > 0 && (math.MaxInt64-ai.start) < ai.step) ||
 				(ai.step < 0 && ai.start < 0 && (math.MinInt64-ai.start) > ai.step) {
 				close(ai.channel)
-				return
+				return ErrOverflow()
 			}
 
 			ai.start += ai.step
@@ -79,8 +89,3 @@ func (ai *AutoInc) MustID() int64 {
 
 	return id
 }
-
-// Stop 停止服务
-//
-// NOTE: 多次调用，会造成死锁。
-func (ai *AutoInc) Stop() { ai.done <- struct{}{} }
