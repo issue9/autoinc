@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2015-2024 caixw
+//
 // SPDX-License-Identifier: MIT
 
 package autoinc
@@ -9,18 +11,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/issue9/assert/v3"
+	"github.com/issue9/assert/v4"
 )
 
 func TestAutoInc_overflow(t *testing.T) {
 	a := assert.New(t, false)
 
 	ai := New(math.MaxInt64-1, 2, 4)
-	a.NotNil(ai)
-	go func() {
-		a.ErrorIs(ai.Serve(context.Background()), ErrOverflow())
-	}()
-	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
+	a.NotNil(ai).
+		Go(func(a *assert.Assertion) {
+			a.ErrorIs(ai.Serve(context.Background()), ErrOverflow())
+		}).
+		Wait(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 
 	id, ok := ai.ID()
 	a.True(ok).Equal(math.MaxInt64-1, id)
@@ -49,9 +51,9 @@ func TestAutoInc_ID_1(t *testing.T) {
 	// 正规的 ai 操作
 	ctx, cancel := context.WithCancel(context.Background())
 	ai := New(0, 2, 2)
-	a.NotNil(ai)
-	go ai.Serve(ctx)
-	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
+	a.NotNil(ai).
+		Go(func(*assert.Assertion) { ai.Serve(ctx) }).
+		Wait(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), i*2)
 	}
@@ -60,9 +62,9 @@ func TestAutoInc_ID_1(t *testing.T) {
 	// 可以从负数起始
 	ctx, cancel = context.WithCancel(context.Background())
 	ai = New(-100, 2, 5)
-	a.NotNil(ai)
-	go ai.Serve(ctx)
-	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
+	a.NotNil(ai).
+		Go(func(*assert.Assertion) { ai.Serve(ctx) }).
+		Wait(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), -100+i*2)
 	}
@@ -71,9 +73,9 @@ func TestAutoInc_ID_1(t *testing.T) {
 	// start,step 双负数
 	ctx, cancel = context.WithCancel(context.Background())
 	ai = New(-100, -3, 0)
-	a.NotNil(ai)
-	go ai.Serve(ctx)
-	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
+	a.NotNil(ai).
+		Go(func(a *assert.Assertion) { ai.Serve(ctx) }).
+		Wait(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 	for i := 0; i < 7; i++ {
 		a.Equal(ai.MustID(), -100+i*-3)
 	}
@@ -86,9 +88,9 @@ func TestAutoInc_ID_2(t *testing.T) {
 	defer cancel()
 
 	ai := New(2, 2, 2)
-	a.NotNil(ai)
-	go ai.Serve(ctx)
-	time.Sleep(500 * time.Microsecond) // 保证 ai.Serve 执行完成
+	a.NotNil(ai).
+		Go(func(a *assert.Assertion) { ai.Serve(ctx) }).
+		Wait(500 * time.Microsecond) // 保证 ai.Serve 执行完成
 
 	mu := sync.Mutex{}
 	mapped := map[int64]bool{}
