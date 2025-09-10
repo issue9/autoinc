@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2015-2024 caixw
+// SPDX-FileCopyrightText: 2015-2025 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -30,7 +30,7 @@ type AutoInc struct {
 	channel     chan int64
 }
 
-// New 声明一个新的 AutoInc 实例
+// New 声明 [AutoInc] 实例
 //
 // start：起始数值；
 // step：步长，可以为负数，但不能为 0；
